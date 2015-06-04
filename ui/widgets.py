@@ -4,8 +4,11 @@ from ttk import Treeview, Combobox
 import re
 
 
-def generate_label(directory):
-    return re.split('/', directory.name)[-1] + " [" + directory.readable_size() + " ]"
+def generate_label(directory, remove_path=True):
+    directory_name = directory.name
+    if remove_path:
+        directory_name = re.split('/', directory.name)[-1]
+    return directory_name + " -> [ " + directory.readable_size() + " ]"
 
 
 def remove_wrong_characters(text):
@@ -18,14 +21,14 @@ class DirectoryTreeView(Treeview):
         self.build_view(directory, self)
 
     def build_view_deep(self, tree_id, tree, subdirectories):
-        for directory in subdirectories:
+        for directory in sorted(subdirectories, key=lambda x: x.size, reverse=True):
             directory_name = generate_label(directory)
             current_tree_id = tree.insert(tree_id, 'end', text=directory_name)
-            if (directory.sub_directories is not None):
-                self.build_view_deep(current_tree_id, tree, directory.sub_directories)
+            self.build_view_deep(current_tree_id, tree, directory.sub_directories)
 
     def build_view(self, directory_root, tree):
-        root_view_id = tree.insert('', 0, 'directories', text=directory_root.name)
+        label = generate_label(directory_root, False)
+        root_view_id = tree.insert('', 0, 'directories', text=label)
         self.build_view_deep(root_view_id, tree, directory_root.sub_directories)
 
 

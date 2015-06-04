@@ -19,15 +19,19 @@ def readable_size(bytes):
     megabyte = kilobyte * 1024.0
     gigabytes = megabyte * 1024.0
     if bytes > gigabytes:
-        return str(bytes / gigabytes) + " GB"
+        return get_formatted_number(bytes, gigabytes, "GB")
     elif bytes > megabyte:
-        return str(bytes / megabyte) + " MB"
+        return get_formatted_number(bytes, megabyte, "MB")
     elif bytes > kilobyte:
-        return str(bytes / kilobyte) + " KB"
+        return get_formatted_number(bytes, kilobyte, "KB")
     else:
-        return str(bytes) + " B"
+        return get_formatted_number(bytes, 1, "B")
+
+
+def get_formatted_number(number, divider, scale):
+    return str(format(number / divider, '.2f')) + " " + scale
 
 
 def print_directory_size(directory):
     size = get_recursive_directory_size_in_bytes(directory)
-    return (directory, readable_size(size))
+    return directory, readable_size(size)

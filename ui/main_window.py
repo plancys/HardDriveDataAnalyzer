@@ -1,21 +1,59 @@
-from Tkinter import *
-from ttk import *
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+from Tkinter import Tk, BOTH, W, N, E, S, Radiobutton, StringVar, Button
+from ttk import Frame, Label, Style
 
-root = Tk()
+import widgets
+from util import model
+from util import directory_util
 
-strategy = StringVar()
-strategy_label = Label(root, text="Analyze strategy: ").grid(row=0, column=0)
-directories = Radiobutton(root, text='Directories', variable=strategy, value='home').grid(row=0, column=1)
-file_types = Radiobutton(root, text='File types', variable=strategy, value='office').grid(row=0, column=2)
 
-root_directory_label = Label(root, text="Root directory:  ").grid(row=0, column=3)
+class Example(Frame):
+    def __init__(self, parent):
+        Frame.__init__(self, parent)
+        self.parent = parent
+        self.initUI()
 
-root_value = StringVar()
-root_combo = Combobox(root, textvariable=root_value)
-root_combo['values'] = [str(x) for x in range(100)]  # ('X', 'Y', 'Z')
-root_combo.current(0)
-root_combo.grid(row=0, column=4)
+    def initUI(self):
+        self.init_frame()
+        lbl = Label(self, text="Disc storage analyzer")
+        lbl.grid(sticky=W, pady=4, padx=5)
+        self.init_result_view()
+        self.init_left_menu()
 
-analyze_button = Button(root, text="Analyze!").grid(row=0, column=5)
+    def init_left_menu(self):
+        strategy = StringVar()
+        Label(self, text="Analyze strategy: ").grid(row=1, column=2)
+        Radiobutton(self, text='Directories', variable=strategy, value='home').grid(row=1, column=3)
+        Radiobutton(self, text='File types', variable=strategy, value='office').grid(row=1, column=4)
+        Label(self, text="Root directory: ").grid(row=2, column=2)
+        widgets.SubdirectoriesCombobox(self, "/").grid(row=2, column=3, columnspan=2)
+        Button(self, text="Analyze").grid(row=3, column=2)
 
-mainloop()
+    def init_result_view(self):
+        start = model.Directory("/Users/kamilkalandyk1/Pictures")
+        directory_util.build_directories_tree(start, 0)
+        analis_result = widgets.DirectoryTreeView(self, start)
+        analis_result.grid(row=1, column=0, columnspan=2, rowspan=4,
+                           padx=5, sticky=E + W + S + N)
+
+    def init_frame(self):
+        self.parent.title("Disk storage analyzer")
+        self.style = Style()
+        self.style.theme_use("default")
+        self.pack(fill=BOTH, expand=1)
+        self.columnconfigure(1, weight=1)
+        self.columnconfigure(3, pad=7)
+        self.rowconfigure(4, weight=1)
+        self.rowconfigure(5, pad=7)
+
+
+def main():
+    root = Tk()
+    root.geometry("800x600+300+300")
+    app = Example(root)
+    root.mainloop()
+
+
+if __name__ == '__main__':
+    main()

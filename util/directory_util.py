@@ -16,6 +16,6 @@ def build_directories_tree(directory, level):
 
 def process_subdirectory(directory, level, subdirectory):
     new_directory = Directory(directory.name + "/" + subdirectory)
-    directory.subDirs.append(new_directory)
+    directory.sub_directories.append(new_directory)
     build_directories_tree(new_directory, level + 1)
     directory.size += new_directory.size
