@@ -8,16 +8,17 @@ from model import Directory
 
 
 def build_directories_tree(directory, level, compute_size=True):
-    current_subdirectories = next(os.walk(directory.name))[1]
+    try:
+        current_subdirectories = next(os.walk(directory.name))[1]
+    except StopIteration:
+        logging.error('Unable to process: %s', directory.name)
+        return
     if 5 <= level or not current_subdirectories:
         if compute_size:
             directory.size = size.get_recursive_directory_size_in_bytes(directory.name)
     else:
-        try:
-            for subdirectory in current_subdirectories:
-                process_subdirectory(directory, level, subdirectory, compute_size)
-        except StopIteration:
-            logging.debug('Unable to process: %s', directory.name)
+        for subdirectory in current_subdirectories:
+            process_subdirectory(directory, level, subdirectory, compute_size)
 
 
 def process_subdirectory(directory, level, subdirectory, compute_size=True):
