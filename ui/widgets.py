@@ -1,4 +1,5 @@
-from Tkinter import StringVar
+from Tkconstants import END
+from Tkinter import StringVar, Listbox
 import os
 from ttk import Treeview, Combobox
 import re
@@ -38,3 +39,41 @@ class SubdirectoriesCombobox(Combobox):
         Combobox.__init__(self, root_view, textvariable=self.root_value)
         dirs = next(os.walk(root_directory))[1]
         self['values'] = [remove_wrong_characters(text) for text in dirs]
+        self.bind("<<ComboboxSelected>>", self.newselection)
+
+    def newselection(self, event):
+        self.value_of_combo = self.get()
+        print(self.value_of_combo)
+
+    def text(self):
+        return self.value_of_combo
+
+
+class DirectoryList(Listbox):
+    def __init__(self, root, directory_root):
+        Listbox.__init__(self, root)
+        self.bind('<Double-Button-1>', self.go)
+        self.directory_root = directory_root
+        self.current_dir = directory_root
+        self.init_view()
+
+    def init_view(self):
+        self.delete(0, END)
+        self.insert(0, "(...)  " + self.directory_root.path())
+        for index, directory in enumerate(self.current_dir.sub_directories):
+            self.insert(index + 1, directory.name_without_path())
+
+    def go(self, event):
+        w = event.widget
+        index = int(w.curselection()[0])
+
+        value = w.get(index)
+        if index == 0:
+            if self.current_dir.parent is not None:
+                self.current_dir = self.current_dir.parent
+                self.init_view()
+        else:
+            next_dir = next((x for x in self.current_dir.sub_directories if x.name_without_path() == value), None)
+            self.current_dir = next_dir
+            self.init_view()
+        print 'You selected item %d: "%s (%s)"' % (index, value, self.current_dir.path())
