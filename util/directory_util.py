@@ -1,3 +1,5 @@
+import logging
+
 __author__ = 'kamilkalandyk1'
 import os
 
@@ -5,17 +7,25 @@ from util import size
 from model import Directory
 
 
-def build_directories_tree(directory, level):
-    if 2 <= level:
-        directory.size = size.get_recursive_directory_size_in_bytes(directory.name)
+def build_directories_tree(directory, level, compute_size=True):
+    current_subdirectories = next(os.walk(directory.name))[1]
+    if 5 <= level or not current_subdirectories:
+        if compute_size:
+            directory.size = size.get_recursive_directory_size_in_bytes(directory.name)
     else:
-        current_subdirectories = next(os.walk(directory.name))[1]
-        for subdirectory in current_subdirectories:
-            process_subdirectory(directory, level, subdirectory)
+        try:
+            for subdirectory in current_subdirectories:
+                process_subdirectory(directory, level, subdirectory, compute_size)
+        except StopIteration:
+            logging.debug('Unable to process: %s', directory.name)
 
 
-def process_subdirectory(directory, level, subdirectory):
-    new_directory = Directory(directory.name + "/" + subdirectory)
+def process_subdirectory(directory, level, subdirectory, compute_size=True):
+    parent_directory_name = directory.name
+    if not parent_directory_name.endswith('/'):
+        parent_directory_name += '/'
+
+    new_directory = Directory(parent_directory_name + subdirectory, directory)
     directory.sub_directories.append(new_directory)
-    build_directories_tree(new_directory, level + 1)
+    build_directories_tree(new_directory, level + 1, compute_size)
     directory.size += new_directory.size

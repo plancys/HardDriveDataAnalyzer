@@ -59,7 +59,7 @@ class DirectoryList(Listbox):
 
     def init_view(self):
         self.delete(0, END)
-        self.insert(0, "(...)  " + self.directory_root.path())
+        self.insert(0, "(...)  " + self.current_dir.path())
         for index, directory in enumerate(self.current_dir.sub_directories):
             self.insert(index + 1, directory.name_without_path())
 
@@ -76,4 +76,6 @@ class DirectoryList(Listbox):
             next_dir = next((x for x in self.current_dir.sub_directories if x.name_without_path() == value), None)
             self.current_dir = next_dir
             self.init_view()
-        print 'You selected item %d: "%s (%s)"' % (index, value, self.current_dir.path())
+
+    def current_path(self):
+        return self.current_dir.name

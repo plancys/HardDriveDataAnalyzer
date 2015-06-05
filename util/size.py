@@ -15,7 +15,7 @@ def get_recursive_directory_size_in_bytes(start_path):
 
 
 def readable_size(bytes):
-    kilobyte = 1000.0
+    kilobyte = 1024.0
     megabyte = kilobyte * 1024.0
     gigabytes = megabyte * 1024.0
     if bytes > gigabytes:
