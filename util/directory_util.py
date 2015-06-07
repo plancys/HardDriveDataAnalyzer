@@ -24,7 +24,7 @@ def build_directories_tree(directory, level, compute_size=True):
         logging.error('Unable to process: %s', directory.name)
         return
     add_files_to_directory(current_files_names, directory)
-    if 5 <= level or not current_subdirectories:
+    if 3 <= level or not current_subdirectories:
         if compute_size:
             directory.size = size_util.recursive_directory_size(directory.name)
     else:
@@ -114,14 +114,14 @@ def filter_filetypes(filter_func, object_types):
     return result
 
 
-def build_filetype_analis(root):
+def build_filetype_analis(root_directory):
     """
 
-    :param root: root directory
+    :param root_directory: root directory
     :return: directory tree starting from root
     """
     file_types_map = defaultdict(list)
-    for dirpath, _, filenames in os.walk(root.name):
+    for dirpath, _, filenames in os.walk(root_directory.name):
         for file_name in filenames:
             file_path = os.path.join(dirpath, file_name)
             try:
