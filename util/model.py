@@ -53,7 +53,13 @@ class File(StorageObject):
         StorageObject.__init__(self, name)
         if size > 0:
             self.size = size
-        self.extension = re.split('\.', self.name)[-1]
+        if "." not in self.name_without_path():
+            self.extension = None
+        else:
+            self.extension = re.split('\.', self.name)[-1]
 
     def is_file(self):
         return False
+
+
+print File("cxcxcxcxc/xcxcx/cxcxcx/cxcxcxc").extension

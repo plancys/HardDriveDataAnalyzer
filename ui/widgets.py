@@ -4,6 +4,8 @@ import os
 from ttk import Treeview, Combobox
 import re
 
+from util.model import Directory
+
 
 def generate_label(storage_object, remove_path=True):
     directory_name = storage_object.name
@@ -17,11 +19,14 @@ def remove_wrong_characters(text):
 
 
 class DirectoryTreeView(Treeview):
-    def __init__(self, root_view, directory):
+    def __init__(self, root_view, root_model):
         Treeview.__init__(self, root_view)
-        self.build_view(directory, self)
-        self.tag_configure('oddrow', background='orange')
-        self.tag_configure('evenrow', background='purple')
+        if isinstance(root_model, Directory):
+            self.build_view(root_model, self)
+            self.tag_configure('oddrow', background='orange')
+            self.tag_configure('evenrow', background='purple')
+        else:
+            self.build_view_for_file_types(root_model)
 
     def build_view_deep(self, tree_id, tree, parent_directory):
         for directory in self.sort_by_size(parent_directory.sub_directories):
@@ -31,7 +36,7 @@ class DirectoryTreeView(Treeview):
 
         for file in self.sort_by_size(parent_directory.files):
             file_name = generate_label(file)
-            tree.insert(tree_id, 'end', text=file_name, tags = ('oddrow',))
+            tree.insert(tree_id, 'end', text=file_name, tags=('oddrow',))
 
     @staticmethod
     def sort_by_size(subdirectories):
@@ -41,6 +46,13 @@ class DirectoryTreeView(Treeview):
         label = generate_label(directory_root, False)
         root_view_id = tree.insert('', 0, 'directories', text=label)
         self.build_view_deep(root_view_id, tree, directory_root)
+
+    def build_view_for_file_types(self, root_model):
+        root_view_id = self.insert('', 0, 'files', text="File types")
+        for filetype in root_model:
+            type_view_id = self.insert(root_view_id, 'end', text=filetype)
+            for file in root_model[filetype]:
+                self.insert(type_view_id, 'end', text=file.name + ' ' + file.readable_size())
 
 
 class SubdirectoriesCombobox(Combobox):

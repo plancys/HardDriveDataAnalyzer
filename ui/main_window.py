@@ -8,8 +8,8 @@ import widgets
 from util import model
 from util import directory_util
 
-xsize = 0
-zunit = "B"
+FILE_STRATEGY = 'file'
+DIRECTORY_STRATEGY = 'directory'
 
 
 class Example(Frame):
@@ -21,8 +21,8 @@ class Example(Frame):
         self.strategy = StringVar()
         self.init_strategy_panel(self.strategy)
 
-        start = model.Directory("/")
-        # start = model.Directory("/Users/kamilkalandyk1/Repositories-Private")
+        # start = model.Directory("/")
+        start = model.Directory("/Users/kamilkalandyk1/Repositories-Private")
         directory_util.build_directories_tree(start, 0, False)
         self.init_root_directory_panel(start)
         self.init_main_panel(start)
@@ -67,17 +67,32 @@ class Example(Frame):
 
     def init_strategy_panel(self, strategy):
         Label(self, text="Analyze strategy: ").grid(row=1, column=2)
-        Radiobutton(self, text='Directories', variable=strategy, value='home').grid(row=1, column=3)
-        Radiobutton(self, text='File types', variable=strategy, value='office').grid(row=1, column=4)
+        strategy.set(DIRECTORY_STRATEGY)
+        self.directory_strategy = Radiobutton(self, text='Directories', variable=strategy, value=DIRECTORY_STRATEGY)
+        self.directory_strategy.grid(row=1, column=3)
+        self.file_strategy = Radiobutton(self, text='File types', variable=strategy, value=FILE_STRATEGY)
+        self.file_strategy.grid(row=1, column=4)
 
     def analyze(self):
         new_dir = model.Directory(self.choose_dir_list.current_path())
-        directory_util.build_directories_tree(new_dir, 0)
+        if self.strategy.get() == DIRECTORY_STRATEGY:
+            self.prepare_results_for_directory_strategy(new_dir)
+        else:
+            self.prepare_results_for_file_type_strategy(new_dir)
+
+    def prepare_results_for_file_type_strategy(self, root):
+        result = directory_util.build_filetype_analis(root)
         size = self.miminal_size.get()
         unit = self.size_unit.get()
-        print size, unit
-        directory_util.filter_structure(lambda x: x.size > (int(size) * unit_sizes[unit]), new_dir)
-        self.init_main_panel(new_dir)
+        filtered = directory_util.filter_filetypes(lambda x: x.size > (int(size) * unit_sizes[unit]), result)
+        self.init_main_panel(filtered)
+
+    def prepare_results_for_directory_strategy(self, root):
+        directory_util.build_directories_tree(root, 0)
+        size = self.miminal_size.get()
+        unit = self.size_unit.get()
+        directory_util.filter_structure(lambda x: x.size > (int(size) * unit_sizes[unit]), root)
+        self.init_main_panel(root)
 
 
 def main():

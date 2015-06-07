@@ -1,3 +1,4 @@
+from collections import defaultdict
 import logging
 import os
 
@@ -56,3 +57,27 @@ def filter_structure(filter_func, root_directory):
     root_directory.files = filtered_files
     for directory in root_directory.sub_directories:
         filter_structure(filter_func, directory)
+
+
+def filter_filetypes(filter_func, object_types):
+    result = defaultdict(list)
+    for type in object_types:
+        filtered = [x for x in object_types[type] if filter_func(x)]
+        if filtered:
+            result[type] = filtered
+    return result
+
+
+def build_filetype_analis(root):
+    file_types_map = defaultdict(list)
+    for dirpath, dirnames, filenames in os.walk(root.name):
+        for f in filenames:
+            fp = os.path.join(dirpath, f)
+            try:
+                file = File(fp)
+                file.size = os.path.getsize(file.name)
+                if file.extension is not None:
+                    file_types_map[file.extension].append(file)
+            except OSError:
+                logging.debug('Unable to process: %s', fp)
+    return file_types_map
