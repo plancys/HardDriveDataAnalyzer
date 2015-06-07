@@ -1,6 +1,13 @@
 import os
 import logging
 
+unit_sizes = {"B": 1,
+              "KB": 1024,
+              "MB": 1024 * 1024,
+              "GB": 1024 * 1024 * 1024,
+              "TB": 1024 * 1024 * 1024 * 1024
+              }
+
 
 def get_recursive_directory_size_in_bytes(start_path):
     total_size = 0

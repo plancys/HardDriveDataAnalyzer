@@ -43,11 +43,16 @@ def process_subdirectory(directory, level, subdirectory, compute_size=True):
     parent_directory_name = directory.name
     if not parent_directory_name.endswith('/'):
         parent_directory_name += '/'
-
     new_directory = Directory(parent_directory_name + subdirectory, directory)
     directory.sub_directories.append(new_directory)
     build_directories_tree(new_directory, level + 1, compute_size)
     directory.size += new_directory.size
 
 
-print next(os.walk("/Users/kamilkalandyk1/Repositories-Private"))[2]
+def filter_structure(filter_func, root_directory):
+    filtered_subdirectories = [x for x in root_directory.sub_directories if filter_func(x)]
+    filtered_files = [x for x in root_directory.files if filter_func(x)]
+    root_directory.sub_directories = filtered_subdirectories
+    root_directory.files = filtered_files
+    for directory in root_directory.sub_directories:
+        filter_structure(filter_func, directory)
