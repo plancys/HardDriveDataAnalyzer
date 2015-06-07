@@ -30,14 +30,9 @@ class StorageObject:
 class Directory(StorageObject):
     def __init__(self, name, parent=None):
         StorageObject.__init__(self, name)
-        # self.name = name
-        # self.size = 0
         self.sub_directories = []
         self.files = []
         self.parent = parent
-
-    # def __init__(self, name, parent=None):
-    #     self.__init__(name)
 
     def __str__(self):
         return self.print_dir(0)

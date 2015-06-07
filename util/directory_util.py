@@ -1,6 +1,4 @@
 import logging
-
-__author__ = 'kamilkalandyk1'
 import os
 
 from util import size
