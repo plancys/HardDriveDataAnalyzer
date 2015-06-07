@@ -5,11 +5,11 @@ from ttk import Treeview, Combobox
 import re
 
 
-def generate_label(directory, remove_path=True):
-    directory_name = directory.name
+def generate_label(storage_object, remove_path=True):
+    directory_name = storage_object.name
     if remove_path:
-        directory_name = re.split('/', directory.name)[-1]
-    return directory_name + " -> [ " + directory.readable_size() + " ]"
+        directory_name = re.split('/', storage_object.name)[-1]
+    return directory_name + " -> [ " + storage_object.readable_size() + " ]"
 
 
 def remove_wrong_characters(text):
@@ -20,17 +20,27 @@ class DirectoryTreeView(Treeview):
     def __init__(self, root_view, directory):
         Treeview.__init__(self, root_view)
         self.build_view(directory, self)
+        self.tag_configure('oddrow', background='orange')
+        self.tag_configure('evenrow', background='purple')
 
-    def build_view_deep(self, tree_id, tree, subdirectories):
-        for directory in sorted(subdirectories, key=lambda x: x.size, reverse=True):
+    def build_view_deep(self, tree_id, tree, parent_directory):
+        for directory in self.sort_by_size(parent_directory.sub_directories):
             directory_name = generate_label(directory)
             current_tree_id = tree.insert(tree_id, 'end', text=directory_name)
-            self.build_view_deep(current_tree_id, tree, directory.sub_directories)
+            self.build_view_deep(current_tree_id, tree, directory)
+
+        for file in self.sort_by_size(parent_directory.files):
+            file_name = generate_label(file)
+            tree.insert(tree_id, 'end', text=file_name, tags = ('oddrow',))
+
+    @staticmethod
+    def sort_by_size(subdirectories):
+        return sorted(subdirectories, key=lambda x: x.size, reverse=True)
 
     def build_view(self, directory_root, tree):
         label = generate_label(directory_root, False)
         root_view_id = tree.insert('', 0, 'directories', text=label)
-        self.build_view_deep(root_view_id, tree, directory_root.sub_directories)
+        self.build_view_deep(root_view_id, tree, directory_root)
 
 
 class SubdirectoriesCombobox(Combobox):

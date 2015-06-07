@@ -23,7 +23,7 @@ class Example(Frame):
         self.combo.grid(row=3, column=3, columnspan=2)
         Button(self, text="Analyze", command=self.analyze).grid(row=4, column=2, sticky=N + W)
 
-        start = model.Directory("/")
+        start = model.Directory("/Users/kamilkalandyk1/Repositories-Private")
         # start = model.Directory("/bin")
         # start = model.Directory("/Users/kamilkalandyk1/Pictures")
         directory_util.build_directories_tree(start, 0, False)
