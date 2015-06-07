@@ -11,6 +11,6 @@ Następną użyteczną funkcjonalnością jest możliwość filtrowania plików/
 
 ## Architektura aplikacji##
 Aplikacje można podzielić na 3 logiczne podzespoły:
--model (Directory, File) - model danych
--widok - przy użyciu biblioteki Tk
--logikę (w postaci utils'ów) która jest odpowiedzialna za analizę danych
+- model (Directory, File) - model danych
+- widok - przy użyciu biblioteki Tk
+- logikę (w postaci utils'ów) która jest odpowiedzialna za analizę danych
