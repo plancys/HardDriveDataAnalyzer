@@ -1,13 +1,21 @@
+"""
+Custom widgets module
+"""
 from Tkconstants import END
-from Tkinter import StringVar, Listbox
-import os
-from ttk import Treeview, Combobox
+from Tkinter import Listbox
+from ttk import Treeview
 import re
 
 from util.model import Directory
 
 
 def generate_label(storage_object, remove_path=True):
+    """
+
+    :param storage_object:  file or directory
+    :param remove_path: write with path or not
+    :return: well formatted string with file/directory label
+    """
     directory_name = storage_object.name
     if remove_path:
         directory_name = re.split('/', storage_object.name)[-1]
@@ -15,89 +23,122 @@ def generate_label(storage_object, remove_path=True):
 
 
 def remove_wrong_characters(text):
+    """
+
+    :param text: file/directory name
+    :return: remove non-ascii characters
+    """
     return ''.join([i if ord(i) < 128 else '' for i in text])
 
 
-class DirectoryTreeView(Treeview):
+class DirectoryTreeView(Treeview):  # pylint: disable=too-many-ancestors
+    """
+    widgets for main view - Tree view with files and directories
+    """
+
     def __init__(self, root_view, root_model):
         Treeview.__init__(self, root_view)
         if isinstance(root_model, Directory):
-            self.build_view(root_model, self)
+            self.build_view(root_model)
             self.tag_configure('oddrow', background='orange')
             self.tag_configure('evenrow', background='purple')
         else:
             self.build_view_for_file_types(root_model)
 
-    def build_view_deep(self, tree_id, tree, parent_directory):
-        for directory in self.sort_by_size(parent_directory.sub_directories):
-            directory_name = generate_label(directory)
-            current_tree_id = tree.insert(tree_id, 'end', text=directory_name)
-            self.build_view_deep(current_tree_id, tree, directory)
+    def build_view_deep(self, tree_id, directory):
+        """
 
-        for file in self.sort_by_size(parent_directory.files):
-            file_name = generate_label(file)
-            tree.insert(tree_id, 'end', text=file_name, tags=('oddrow',))
+        :param tree_id: parent tree view item id
+        :param directory:
+        :return: start tree view initialisation
+        """
+        for directory in self.sort_by_size(directory.sub_directories):
+            directory_name = generate_label(directory)
+            current_tree_id = self.insert(tree_id, 'end', text=directory_name)
+            self.build_view_deep(current_tree_id, directory)
+
+        for file_name in self.sort_by_size(directory.files):
+            file_name = generate_label(file_name)
+            self.insert(tree_id, 'end', text=file_name, tags=('oddrow',))
 
     @staticmethod
     def sort_by_size(subdirectories):
+        """
+        :param subdirectories:
+        :return: subdirectories sorted by size
+        """
         return sorted(subdirectories, key=lambda x: x.size, reverse=True)
 
-    def build_view(self, directory_root, tree):
+    def build_view(self, directory_root):
+        """
+
+        :param directory_root:
+        :return: build view in self
+        """
         label = generate_label(directory_root, False)
-        root_view_id = tree.insert('', 0, 'directories', text=label)
-        self.build_view_deep(root_view_id, tree, directory_root)
+        root_view_id = self.insert('', 0, 'directories', text=label)
+        self.build_view_deep(root_view_id, directory_root)
 
-    def build_view_for_file_types(self, root_model):
+    def build_view_for_file_types(self, files_per_file_type):
+        """
+
+        :param files_per_file_type: file types map
+        :return: build file type view
+        """
         root_view_id = self.insert('', 0, 'files', text="File types")
-        for filetype in root_model:
+        for filetype in files_per_file_type:
             type_view_id = self.insert(root_view_id, 'end', text=filetype)
-            for file in root_model[filetype]:
-                self.insert(type_view_id, 'end', text=file.name + ' ' + file.readable_size())
+            for file_name in files_per_file_type[filetype]:
+                file_name_label = file_name.name + ' ' + file_name.readable_size()
+                self.insert(type_view_id, 'end', text=file_name_label)
 
 
-class SubdirectoriesCombobox(Combobox):
-    def __init__(self, root_view, root_directory):
-        self.root_value = StringVar()
-        Combobox.__init__(self, root_view, textvariable=self.root_value)
-        dirs = next(os.walk(root_directory))[1]
-        self['values'] = [remove_wrong_characters(text) for text in dirs]
-        self.bind("<<ComboboxSelected>>", self.newselection)
+class DirectoryList(Listbox):  # pylint: disable=too-many-ancestors
+    """
+    Directory list with enter end exit directories feature
+    """
 
-    def newselection(self, event):
-        self.value_of_combo = self.get()
-        print(self.value_of_combo)
-
-    def text(self):
-        return self.value_of_combo
-
-
-class DirectoryList(Listbox):
     def __init__(self, root, directory_root):
         Listbox.__init__(self, root)
-        self.bind('<Double-Button-1>', self.go)
+        self.bind('<Double-Button-1>', self.go_to_directory)
         self.directory_root = directory_root
         self.current_dir = directory_root
         self.init_view()
 
     def init_view(self):
+        """
+
+        :return: init view
+        """
         self.delete(0, END)
         self.insert(0, "(...)  " + self.current_dir.name)
         for index, directory in enumerate(self.current_dir.sub_directories):
             self.insert(index + 1, directory.name_without_path())
 
-    def go(self, event):
-        w = event.widget
-        index = int(w.curselection()[0])
+    def go_to_directory(self, event):
+        """
+        :param event:
+        :return: after double click goes to double clicked directory
 
-        value = w.get(index)
+        """
+        widget = event.widget
+        index = int(widget.curselection()[0])
+
+        value = widget.get(index)
         if index == 0:
             if self.current_dir.parent is not None:
                 self.current_dir = self.current_dir.parent
                 self.init_view()
         else:
-            next_dir = next((x for x in self.current_dir.sub_directories if x.name_without_path() == value), None)
+            current_directory = (x for x in self.current_dir.sub_directories
+                                 if x.name_without_path() == value)
+            next_dir = next(current_directory, None)
             self.current_dir = next_dir
             self.init_view()
 
     def current_path(self):
+        """
+
+        :return: current path on this widget
+        """
         return self.current_dir.name
