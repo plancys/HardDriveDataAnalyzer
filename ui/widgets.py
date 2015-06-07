@@ -81,7 +81,7 @@ class DirectoryList(Listbox):
 
     def init_view(self):
         self.delete(0, END)
-        self.insert(0, "(...)  " + self.current_dir.path())
+        self.insert(0, "(...)  " + self.current_dir.name)
         for index, directory in enumerate(self.current_dir.sub_directories):
             self.insert(index + 1, directory.name_without_path())
 

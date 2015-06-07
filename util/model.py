@@ -1,65 +1,77 @@
+"""
+Module with model for Storage application
+"""
 import re
 import abc
 
-import size
+from util import size_util
 
 
-class StorageObject:
+class StorageObject(object):
+    """Abstract class for directory and file"""
+
     def __init__(self, name):
         self.name = name
         self.size = 0
 
     def readable_size(self):
-        return size.readable_size(self.size)
+        """
+        :return: return human readable size of file or directory
+        """
+        return size_util.readable_size(self.size)
 
     def name_without_path(self):
+        """
+
+        :return: return name without path
+        """
         return re.split('/', self.name)[-1]
 
-    def path(self):
-        return self.name
-
     def up_path(self):
-        k = self.name.rfind("/")
-        return self.name[:k]
+        """
+
+        :return: returns parent path
+        """
+        last_slash = self.name.rfind("/")
+        return self.name[:last_slash]
 
     @abc.abstractmethod
     def is_file(self):
+        """
+
+        :return: return whether it is file or not
+        """
         return
 
 
 class Directory(StorageObject):
+    """Model class for directory."""
+
     def __init__(self, name, parent=None):
         StorageObject.__init__(self, name)
         self.sub_directories = []
         self.files = []
         self.parent = parent
 
-    def __str__(self):
-        return self.print_dir(0)
-
-    def print_dir(self, level):
-        return '\t' * level + str(self.name) + ", size=" + str(self.size) + "\n" + '\n'.join(
-            [x.print_dir(level + 1) for x in self.sub_directories])
-
-    def print_sub_dirs(self):
-        return '\n'.join([str(x) for x in self.sub_directories])
-
     def is_file(self):
         return False
 
 
 class File(StorageObject):
-    def __init__(self, name, size=0):
+    """Model class for file."""
+
+    def __init__(self, name, file_size=0):
         StorageObject.__init__(self, name)
-        if size > 0:
-            self.size = size
+        if file_size > 0:
+            self.size = file_size
         if "." not in self.name_without_path():
             self.extension = None
         else:
-            self.extension = re.split('\.', self.name)[-1]
+            self.extension = re.split(r'\.', self.name)[-1]
 
     def is_file(self):
-        return False
+        """
 
-
-print File("cxcxcxcxc/xcxcx/cxcxcx/cxcxcxc").extension
+        :return: returns whether it is a file
+        """
+        return True

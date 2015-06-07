@@ -1,9 +1,7 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
 from Tkinter import Tk, BOTH, W, N, E, S, Radiobutton, StringVar, Button, Spinbox
 from ttk import Frame, Label, Style, Combobox
 
-from util.size import unit_sizes
+from util.size_util import UNIT_SIZES
 import widgets
 from util import model
 from util import directory_util
@@ -19,8 +17,12 @@ class Example(Frame):
         lbl = Label(self, text="Disc storage analyzer")
         lbl.grid(sticky=W, pady=4, padx=5)
         self.strategy = StringVar()
-        self.init_strategy_panel(self.strategy)
+        # init strategy panel
+        # strategy_panel = self.init_strategy_panel()
+        # self.directory_strategy = strategy_panel[0]
+        # self.file_strategy = strategy_panel[1]
 
+        self.init_strategy_panel(self.strategy)
         # start = model.Directory("/")
         start = model.Directory("/Users/kamilkalandyk1/Repositories-Private")
         directory_util.build_directories_tree(start, 0, False)
@@ -37,7 +39,7 @@ class Example(Frame):
 
         self.size_unit = StringVar()
         self.size_combo = Combobox(self, textvariable=self.size_unit)
-        self.size_combo['values'] = unit_sizes.keys()
+        self.size_combo['values'] = UNIT_SIZES.keys()
         self.size_combo.current(0)
         # self.size_combo['values'] = ["B", "KB", "MB", "GB", "TB"]
         self.size_combo.grid(row=5, column=4)
@@ -72,6 +74,7 @@ class Example(Frame):
         self.directory_strategy.grid(row=1, column=3)
         self.file_strategy = Radiobutton(self, text='File types', variable=strategy, value=FILE_STRATEGY)
         self.file_strategy.grid(row=1, column=4)
+        # return (directory_strategy, file_strategy)
 
     def analyze(self):
         new_dir = model.Directory(self.choose_dir_list.current_path())
@@ -84,14 +87,14 @@ class Example(Frame):
         result = directory_util.build_filetype_analis(root)
         size = self.miminal_size.get()
         unit = self.size_unit.get()
-        filtered = directory_util.filter_filetypes(lambda x: x.size > (int(size) * unit_sizes[unit]), result)
+        filtered = directory_util.filter_filetypes(lambda x: x.size > (int(size) * UNIT_SIZES[unit]), result)
         self.init_main_panel(filtered)
 
     def prepare_results_for_directory_strategy(self, root):
         directory_util.build_directories_tree(root, 0)
         size = self.miminal_size.get()
         unit = self.size_unit.get()
-        directory_util.filter_structure(lambda x: x.size > (int(size) * unit_sizes[unit]), root)
+        directory_util.filter_structure(lambda x: x.size > (int(size) * UNIT_SIZES[unit]), root)
         self.init_main_panel(root)
 
 

@@ -1,12 +1,22 @@
+"""
+Helper module for building directory trees
+"""
 from collections import defaultdict
 import logging
 import os
 
-from util import size
-from model import Directory, File
+from util.model import Directory, File
+from util import size_util
 
 
 def build_directories_tree(directory, level, compute_size=True):
+    """
+
+    :param directory: root directory
+    :param level: level of depth
+    :param compute_size: decides whether compute size or not
+    :return: directory tree in (directory)
+    """
     try:
         current_subdirectories = get_subdirectories_list(directory)
         current_files_names = get_files_list(directory)
@@ -16,13 +26,19 @@ def build_directories_tree(directory, level, compute_size=True):
     add_files_to_directory(current_files_names, directory)
     if 5 <= level or not current_subdirectories:
         if compute_size:
-            directory.size = size.get_recursive_directory_size_in_bytes(directory.name)
+            directory.size = size_util.recursive_directory_size(directory.name)
     else:
         for subdirectory in current_subdirectories:
             process_subdirectory(directory, level, subdirectory, compute_size)
 
 
 def add_files_to_directory(current_files_names, directory):
+    """
+
+    :param current_files_names: list with file names
+    :param directory: decorate directory -> add files
+    :return: None
+    """
     for file_name in current_files_names:
         current_file = File(directory.name + '/' + file_name)
         try:
@@ -33,14 +49,32 @@ def add_files_to_directory(current_files_names, directory):
 
 
 def get_subdirectories_list(directory):
+    """
+
+    :param directory:
+    :return: returns subdirectories fo directory
+    """
     return next(os.walk(directory.name))[1]
 
 
 def get_files_list(directory):
+    """
+
+    :param directory:
+    :return: returns files from directory
+    """
     return next(os.walk(directory.name))[2]
 
 
 def process_subdirectory(directory, level, subdirectory, compute_size=True):
+    """
+
+    :param directory: parent directory
+    :param level: directory tree current depth level
+    :param subdirectory: subdirectory to process
+    :param compute_size: decides wheteher to compute sizes or not
+    :return:
+    """
     parent_directory_name = directory.name
     if not parent_directory_name.endswith('/'):
         parent_directory_name += '/'
@@ -51,6 +85,12 @@ def process_subdirectory(directory, level, subdirectory, compute_size=True):
 
 
 def filter_structure(filter_func, root_directory):
+    """
+
+    :param filter_func: function which filter directories
+    :param root_directory: root directory
+    :return: filtered root directory tree
+    """
     filtered_subdirectories = [x for x in root_directory.sub_directories if filter_func(x)]
     filtered_files = [x for x in root_directory.files if filter_func(x)]
     root_directory.sub_directories = filtered_subdirectories
@@ -60,24 +100,35 @@ def filter_structure(filter_func, root_directory):
 
 
 def filter_filetypes(filter_func, object_types):
+    """
+
+    :param filter_func: function to file type filter
+    :param object_types: map [extension] -> [file1, file2, ...]
+    :return: filtered object_types
+    """
     result = defaultdict(list)
-    for type in object_types:
-        filtered = [x for x in object_types[type] if filter_func(x)]
+    for file_type in object_types:
+        filtered = [x for x in object_types[file_type] if filter_func(x)]
         if filtered:
-            result[type] = filtered
+            result[file_type] = filtered
     return result
 
 
 def build_filetype_analis(root):
+    """
+
+    :param root: root directory
+    :return: directory tree starting from root
+    """
     file_types_map = defaultdict(list)
-    for dirpath, dirnames, filenames in os.walk(root.name):
-        for f in filenames:
-            fp = os.path.join(dirpath, f)
+    for dirpath, _, filenames in os.walk(root.name):
+        for file_name in filenames:
+            file_path = os.path.join(dirpath, file_name)
             try:
-                file = File(fp)
-                file.size = os.path.getsize(file.name)
-                if file.extension is not None:
-                    file_types_map[file.extension].append(file)
+                new_file = File(file_path)
+                new_file.size = os.path.getsize(new_file.name)
+                if new_file.extension is not None:
+                    file_types_map[new_file.extension].append(new_file)
             except OSError:
-                logging.debug('Unable to process: %s', fp)
+                logging.debug('Unable to process: %s', file_path)
     return file_types_map
