@@ -14,3 +14,8 @@ Aplikacje można podzielić na 3 logiczne podzespoły:
 - model (Directory, File) - model danych
 - widok - przy użyciu biblioteki Tk
 - logikę (w postaci utils'ów) która jest odpowiedzialna za analizę danych
+
+
+
+## Screen ##
+![Screen](documentation/screen1.png)
