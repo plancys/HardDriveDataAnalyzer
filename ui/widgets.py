@@ -7,7 +7,7 @@ from ttk import Treeview
 import re
 
 from util.directory_util import get_subdirectories_list
-from util.model import Directory
+from logic.model import Directory
 
 
 def generate_label(storage_object, remove_path=True):
@@ -114,11 +114,16 @@ class DirectoryList(Listbox):  # pylint: disable=too-many-ancestors
         self.delete(0, END)
         self.insert(0, "(...)  " + self.current_dir.name)
         subdirectories = self.current_dir.sub_directories
-        self.add_subdirectories_if_not_loaded(subdirectories)
+        self.refresh_subdirectories(subdirectories)
         for index, directory in enumerate(subdirectories):
             self.insert(index + 1, directory.name_without_path())
 
-    def add_subdirectories_if_not_loaded(self, subdirectories):
+    def refresh_subdirectories(self, subdirectories):
+        """
+
+        :param subdirectories: current subdirectories
+        :return: decorated subdirectories - added subdirectories if any exist
+        """
         actual_subdirectories_names = get_subdirectories_list(self.current_dir)
         if not subdirectories and actual_subdirectories_names:
             # subdirectories = actual_subdirectories_names

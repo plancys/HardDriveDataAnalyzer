@@ -5,7 +5,7 @@ from collections import defaultdict
 import logging
 import os
 
-from util.model import Directory, File
+from logic.model import Directory, File
 from util import size_util
 
 
