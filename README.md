@@ -1,4 +1,4 @@
-# HardDriveDataAnalyzer#
+#HardDriveDataAnalyzer
 
 Aplikacja analizująca dane na dysku twardym i prezentująca użytkownikowi w sposób interaktywny w jaki sposób jest zajęte miejsce (które foldery/typy plików zajmują go najwięcej) - narzędzie pozwalające na ocenienie jak najłatwiej uzyskać wolne miejsce, sugerujące które można usunąć.
 
@@ -9,14 +9,14 @@ Jest również opcja przeszukiwania plików po ich rozszerzeniu. Otrzymujemy wte
 
 Następną użyteczną funkcjonalnością jest możliwość filtrowania plików/folderów po rozmiarze np. począwszy od folderu x możemy znaleźć wszystkie pliki/folderu które zajmują więcej niż 1GB.
 
-## Architektura aplikacji##
+## Architektura aplikacji
 Aplikacje można podzielić na 3 logiczne podzespoły:
 - model (plik model.py w module logic) - model danych
 - widok (moduł ui) - przy użyciu biblioteki Tk
 - logikę (moduł logic) która jest odpowiedzialna za analizę danych
 
 
-## Uruchamianie lokalne ##
+## Uruchamianie lokalne
 
 Aby uruchomić aplikację wystarczy uruchomić app.py
 

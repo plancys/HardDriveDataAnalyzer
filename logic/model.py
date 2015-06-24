@@ -3,7 +3,6 @@ Module with model for Storage application
 """
 import re
 import abc
-# from util import size_util
 import operator
 
 UNIT_SIZES = {"B": 1,
@@ -23,12 +22,6 @@ class StorageObject(object):
     def __init__(self, name):
         self.name = name
         self.size = 0
-
-    # def readable_size(self):
-    #     """
-    #     :return: return human readable size of file or directory
-    #     """
-    #     return self.readable_size(self.size)
 
     def name_without_path(self):
         """
