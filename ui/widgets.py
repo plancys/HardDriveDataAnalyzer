@@ -6,6 +6,7 @@ from Tkinter import Listbox
 from ttk import Treeview
 import re
 
+from util.directory_util import get_subdirectories_list
 from util.model import Directory
 
 
@@ -112,8 +113,20 @@ class DirectoryList(Listbox):  # pylint: disable=too-many-ancestors
         """
         self.delete(0, END)
         self.insert(0, "(...)  " + self.current_dir.name)
-        for index, directory in enumerate(self.current_dir.sub_directories):
+        subdirectories = self.current_dir.sub_directories
+        self.add_subdirectories_if_not_loaded(subdirectories)
+        for index, directory in enumerate(subdirectories):
             self.insert(index + 1, directory.name_without_path())
+
+    def add_subdirectories_if_not_loaded(self, subdirectories):
+        actual_subdirectories_names = get_subdirectories_list(self.current_dir)
+        if not subdirectories and actual_subdirectories_names:
+            # subdirectories = actual_subdirectories_names
+            for subdirectory_name in actual_subdirectories_names:
+                new_directory = Directory(self.current_dir.name + "/" + subdirectory_name)
+                new_directory.parent = self.current_dir
+                subdirectories.append(new_directory)
+            self.current_dir.sub_directories = subdirectories
 
     def go_to_directory(self, event):
         """
@@ -126,6 +139,7 @@ class DirectoryList(Listbox):  # pylint: disable=too-many-ancestors
 
         value = widget.get(index)
         if index == 0:
+            # go to upstream directory
             if self.current_dir.parent is not None:
                 self.current_dir = self.current_dir.parent
                 self.init_view()

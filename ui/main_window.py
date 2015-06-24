@@ -31,6 +31,7 @@ class Application(Frame):  # pylint: disable=too-many-ancestors
         Label(self, text="Root directory: ").grid(row=2, column=2)
         self.choose_dir_list = widgets.DirectoryList(self, start)
         self.choose_dir_list.grid(row=3, column=2, columnspan=3, sticky=E + W)
+
         self.init_main_panel(start)
         self.init_filtering_by_size_panel()
         self.configure_main_view()
@@ -89,7 +90,6 @@ class Application(Frame):  # pylint: disable=too-many-ancestors
         """
         :return: check particular path after clicking analysis button
         """
-        print self.minimal_size_var.get()
         new_dir = model.Directory(self.choose_dir_list.current_path())
         if self.strategy.get() == DIRECTORY_STRATEGY:
             self.results_for_directory_strategy(new_dir)
