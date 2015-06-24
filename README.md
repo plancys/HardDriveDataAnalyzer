@@ -18,6 +18,6 @@ Aplikacje można podzielić na 3 logiczne podzespoły:
 
 ## Uruchamianie lokalne ##
 
-Aby uruchomić aplikację w lokalnym środowisku, wystarczy uruchomić app.py
+Aby uruchomić aplikację wystarczy uruchomić app.py
 
      $ python app.py
