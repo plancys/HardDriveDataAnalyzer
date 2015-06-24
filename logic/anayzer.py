@@ -1,5 +1,5 @@
 """
-Module with analysis tools
+Analyzer logic
 """
 from logic.model import UNIT_SIZES, Directory, DIRECTORY_STRATEGY
 from util import directory_util

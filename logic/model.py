@@ -1,5 +1,5 @@
 """
-Module with model for Storage application
+Model classes
 """
 import re
 import abc
@@ -113,3 +113,10 @@ class FilterCriteria(object):
         :return: return whether any filter is applied
         """
         return self.minimal_size != 0 and self.size_unit
+
+    def print_filter_criteria(self):
+        """
+
+        :return: Print criteria for logging purposes
+        """
+        return "Criteria { Minimal size = ", self.minimal_size, ", unit = ", self.size_unit, "}"
