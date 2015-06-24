@@ -5,6 +5,16 @@ from logic.model import UNIT_SIZES, Directory, DIRECTORY_STRATEGY
 from util import directory_util
 
 
+def generate_initial_hierarchy(root_directory_path):
+    """
+    :param root_directory_path: starting point
+    :return: return directories with hierarchy
+    """
+    root_directory = Directory(root_directory_path)
+    directory_util.build_directories_tree(root_directory, 0, False)
+    return root_directory
+
+
 def analyze_path(strategy, root_directory_path, filter_data):
     """
 

@@ -6,10 +6,8 @@ from ttk import Frame, Label, Combobox
 
 from ui import widgets
 from logic.model import FilterCriteria, UNIT_SIZES, DIRECTORY_STRATEGY
-from logic import model
 from logic.model import FILE_STRATEGY
-from logic.anayzer import analyze_path
-from util import directory_util
+from logic.anayzer import analyze_path, generate_initial_hierarchy
 
 
 class Application(Frame):  # pylint: disable=too-many-ancestors
@@ -24,8 +22,7 @@ class Application(Frame):  # pylint: disable=too-many-ancestors
         self.minimal_size_var = StringVar()
         self.size_unit_var = StringVar()
         self.init_strategy_panel(self.strategy)
-        start = model.Directory("/")
-        directory_util.build_directories_tree(start, 0, False)
+        start = generate_initial_hierarchy("/")
         # init directory browser
         Label(self, text="Root directory: ").grid(row=2, column=2 + 2)
         self.choose_dir_list = widgets.DirectoryList(self, start)
