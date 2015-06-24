@@ -15,3 +15,9 @@ Aplikacje można podzielić na 3 logiczne podzespoły:
 - widok (moduł ui) - przy użyciu biblioteki Tk
 - logikę (moduł logic) która jest odpowiedzialna za analizę danych
 
+
+## Uruchamianie lokalne ##
+
+Aby uruchomić aplikację w lokalnym środowisku, wystarczy uruchomić app.py
+
+     $ python app.py

@@ -1,7 +1,7 @@
 """
 Module responsible for presenting data (UI)
 """
-from Tkinter import Tk, BOTH, W, N, E, S, Radiobutton, StringVar, Button, Spinbox
+from Tkinter import BOTH, W, N, E, S, Radiobutton, StringVar, Button, Spinbox
 from ttk import Frame, Label, Combobox
 
 from ui import widgets
@@ -96,18 +96,3 @@ class Application(Frame):  # pylint: disable=too-many-ancestors
         analis_path = self.choose_dir_list.current_path()
         result = analyze_path(self.strategy.get(), analis_path, filter_criteria)
         self.init_main_panel(result)
-
-
-def main():
-    """
-
-    :return: main loop
-    """
-    root = Tk()
-    root.geometry("800x600+300+300")
-    Application(root)
-    root.mainloop()
-
-
-if __name__ == '__main__':
-    main()
